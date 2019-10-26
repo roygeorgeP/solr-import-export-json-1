@@ -60,6 +60,8 @@ public class CommandLineConfig {
   
   private ActionType actionType;
   private String solrUrl;
+  private String solrUser;
+  private String solrPassword;
   private String fileName;
   private Boolean deleteAll;
   private Set<SolrField> skipFieldSet = Collections.emptySet();
@@ -84,6 +86,23 @@ public class CommandLineConfig {
   public void setSolrUrl(String solrUrl) {
     this.solrUrl = solrUrl;
   }
+
+  public String getSolrUser() {
+	return solrUser;
+  }
+
+  public void setSolrUser(String solrUser) {
+	this.solrUser = solrUser;
+  }
+
+  public String getSolrPassword() {
+	return solrPassword;
+  }
+
+  public void setSolrPassword(String solrPassword) {
+	this.solrPassword = solrPassword;
+  }
+
 
   /**
    * @return the dryRun
@@ -252,8 +271,8 @@ public class CommandLineConfig {
   @Override
   public String toString()
   {
-    return String.format("CommandLineConfig [actionType=%s, solrUrl=%s, fileName=%s, deleteAll=%s, skipFieldsSet=%s, filterQuery=%s, uniqueKey=%s, dryRun=%s, blockSize=%s, dateTimeFormat=%s]",
-                         actionType, solrUrl, fileName, deleteAll, skipFieldSet, filterQuery, uniqueKey, dryRun, blockSize, dateTimeFormat);
+    return String.format("CommandLineConfig [actionType=%s, solrUrl=%s, solrUser=%s, solrPassword=%s, fileName=%s, deleteAll=%s, skipFieldsSet=%s, filterQuery=%s, uniqueKey=%s, dryRun=%s, blockSize=%s, dateTimeFormat=%s]",
+                         actionType, solrUrl, solrUser, solrPassword, fileName, deleteAll, skipFieldSet, filterQuery, uniqueKey, dryRun, blockSize, dateTimeFormat);
   }
 
 }

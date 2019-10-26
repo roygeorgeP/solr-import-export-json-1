@@ -25,6 +25,8 @@ public class ConfigFactory {
   private static final String[] SKIP_DOCS          = new String[] {"x", "skipCount"};
   private static final String[] COMMIT_DURING_WORK = new String[] {"c", "commitDuringImport"};
   private static final String[] SOLR_URL           = new String[] {"s", "solrUrl"};
+  private static final String[] SOLR_USER          = new String[] {"u", "username"};
+  private static final String[] SOLR_PASS		   = new String[] {"p","password"};
   private static final String[] ACTION_TYPE        = new String[] {"a", "actionType"};
   private static final String[] OUTPUT             = new String[] {"o", "output"};
   private static final String[] DELETE_ALL         = new String[] {"d", "deleteAll"};
@@ -48,6 +50,8 @@ public class ConfigFactory {
   {
     CommandLine cmd = parseCommandLine(args);
     String solrUrl = cmd.getOptionValue(SOLR_URL[1]);
+    String solrUser = cmd.getOptionValue(SOLR_USER[1]);
+    String solrPassword = cmd.getOptionValue(SOLR_PASS[1]);
     String skipFields = cmd.getOptionValue(SKIP_FIELDS[1]);
     String includeFields = cmd.getOptionValue(INCLUDE_FIELDS[1]);
     String file = cmd.getOptionValue(OUTPUT[1]);
@@ -71,6 +75,9 @@ public class ConfigFactory {
 
     CommandLineConfig c = new CommandLineConfig();
     c.setSolrUrl(solrUrl);
+    c.setSolrUser(solrUser);
+    c.setSolrPassword(solrPassword);
+    
     c.setFileName(file);
 
     if (uniqueKey != null) {
@@ -154,6 +161,8 @@ public class ConfigFactory {
   {
     Options cliOptions = new Options();
     cliOptions.addOption(SOLR_URL[0], SOLR_URL[1], true, "solr url - http://localhost:8983/solr/collection_name");
+    cliOptions.addOption(SOLR_USER[0], SOLR_USER[1], true, "solr user");
+    cliOptions.addOption(SOLR_PASS[0], SOLR_PASS[1], true, "solr password");
     cliOptions.addOption(ACTION_TYPE[0], ACTION_TYPE[1], true, "action type [" + String.join("|", ActionType.getNames()) + "]");
     cliOptions.addOption(OUTPUT[0], OUTPUT[1], true, "output file");
     cliOptions.addOption(DELETE_ALL[0], DELETE_ALL[1], false, "delete all documents before import");

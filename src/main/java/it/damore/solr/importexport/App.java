@@ -23,11 +23,11 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -313,7 +313,12 @@ public class App {
     solrQuery.setQuery("*:*");
     solrQuery.setFields("*");
     if (config.getFilterQuery() != null) {
-      solrQuery.addFilterQuery(config.getFilterQuery());
+      String [] filters = config.getFilterQuery().split(",");
+      for ( String filter : filters ) {
+    	  if ( ! filter.equals ( "*" ) ) {
+    		  solrQuery.addFilterQuery(filter); 
+    	  }
+      }
     }
     if (!includeFieldsEquals.isEmpty()) {
       solrQuery.setFields(includeFieldsEquals.stream()
@@ -323,6 +328,11 @@ public class App {
     solrQuery.setRows(0);
 
     solrQuery.addSort(config.getUniqueKey(), ORDER.asc); // Pay attention to this line
+    
+    QueryRequest req = new QueryRequest(solrQuery);
+    req.setBasicAuthCredentials(config.getSolrUser(), config.getSolrPassword());
+
+
 
     String cursorMark = CursorMarkParams.CURSOR_MARK_START;
 
@@ -330,9 +340,10 @@ public class App {
 
     DateFormat df = new SimpleDateFormat(config.getDateTimeFormat());
     objectMapper.setDateFormat(df);
+    
     objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-
-    QueryResponse r = client.query(solrQuery);
+    
+    QueryResponse r = req.process(client);
 
     long nDocuments = r.getResults()
                        .getNumFound();
@@ -345,8 +356,13 @@ public class App {
         solrQuery.setRows(config.getBlockSize());
         boolean done = false;
         while (!done) {
+          
           solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
-          QueryResponse rsp = client.query(solrQuery);
+          req = new QueryRequest(solrQuery);
+          req.setBasicAuthCredentials(config.getSolrUser(), config.getSolrPassword());
+          
+          QueryResponse rsp =  req.process(client);  //client.query(solrQuery);
+          
           String nextCursorMark = rsp.getNextCursorMark();
           if (nextCursorMark == null) {
             logger.warn("ATTENTION: you're dealing with a old version of Solr which does not support cursors");
